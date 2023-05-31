@@ -13,7 +13,6 @@
 #include <signal.h>
 
 
-
 struct linux_dirent {
     unsigned long  d_ino;
     off_t          d_off;
@@ -54,16 +53,6 @@ const int (*tabela_kazalcev_funkcij_ukazov[])() = {
 
 
 int ukaz_lookup(){
-    /* redundantno
-    //prvi token je prazen - vpisan je bil presledek
-    int zacetek_ukaza_tokeni;
-    while(tokens[zacetek_ukaza_tokeni]==NULL && zacetek_ukaza_tokeni<MAX_TOKENS){
-        zacetek_ukaza_tokeni++;
-    }
-    if(zacetek_ukaza_tokeni==MAX_TOKENS){
-        //ni bilo ukaza -- prazna vrstica/komentar/...
-        return 0;
-    } */
 
     if(tokens[0] == NULL) return 0; //ce ni ukaza -- prazna vrstica, presledki, zakomentirano (samo narekovaji se vedno povzrovi napako ampak to ni vrstica v pravilni obliki)
     //v tabeli imen ukazov poisce (prvi token) in vrne njegov indeks
@@ -99,9 +88,6 @@ int tokenize (char* vrstica, char** tokens){
     int dolzina_vrstice = strlen(vrstica);
     int v_narekovaju = 0;
     int zacni_nov_token = 1;
-
-    //prvi token se zacne na zacetku vrstice (ce so vse vrstice v pravilni obliki naj se ne bi zacel z presledkom ali ")
-    //*(tokens+token_indeks++) = vrstica;
 
     //sprehod cez vrstico
     while(running_indeks < dolzina_vrstice){
@@ -163,6 +149,7 @@ int zunanji_ukaz(){
         return status_za_return;
     }
     else if(pid == 0){
+        //otrok
         if(preusmeritev_izhoda){
             int p_i_fd = open(preusmerjen_izhod, O_WRONLY | O_CREAT | O_TRUNC, 0644);
             if(p_i_fd < 0){
@@ -842,6 +829,7 @@ int waitall(){
 //Cevovod
 
 int pipes(){
+    //TODO
     return -1;
 }
 
@@ -865,18 +853,14 @@ int main(){
 
     setbuf(stdout, NULL);
 
-    if(isatty(0)){
-        nacin = 1;
-    }
-    else{
-        nacin = 0;
-    }
+    if(isatty(0)) nacin = 1;
+    else nacin = 0;
 
     // REPL
 
     while(1){
 
-        //init
+        //reset to initial for new iteration
         *izhodni_izpis = NULL;
         preusmeritev_izhoda = 0;
         preusmeritev_vhoda = 0;
@@ -884,14 +868,14 @@ int main(){
         //izpis poziva
         if(nacin) printf("%s> ", ime_lupine);
         
-        //read
+        //READ
         if(fgets(line, 1000, stdin) == NULL){
             //EOF!
             break;
         };
         fflush(stdin);
 
-        //eval
+        //EVAL
         token_count = tokenize(line, tokens);
         int indeks_ukaza = ukaz_lookup();
 
@@ -946,6 +930,8 @@ int main(){
                     preusmeritev_vhoda = 0;
                 }
                 izhodni_status = tabela_kazalcev_funkcij_ukazov[indeks_ukaza]();
+
+                //PRINT (1/2)
                 printf("%s",izhodni_izpis);
                 exit(izhodni_status);
             }
@@ -1003,6 +989,8 @@ int main(){
                 }
             }
             izhodni_status = tabela_kazalcev_funkcij_ukazov[indeks_ukaza]();
+
+            //PRINT (2/2)
             printf("%s",izhodni_izpis);
 
             //restore fd ce je bila preusmeritev
@@ -1031,10 +1019,9 @@ int main(){
         }
         
 
-    } //loop {while 1}
+    } //LOOP {while 1}
 
-    // -REPL
-
+    // --REPL
 
     return 0;
 }
