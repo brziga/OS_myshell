@@ -849,14 +849,12 @@ int waitall(){
 int izvajanje_ukaza_v_cevovodu(int st_stopnje){
     //ker se bo klicalo samo v otroku, lahko povozi prejsnje stvari
 
-
     sprintf(line, "%s", tokens[st_stopnje+1]);
     //sprintf da terminira z \0
     // +1 zato ker prvi token je "pipes"
 
     *izhodni_izpis = NULL;
-    preusmeritev_izhoda = 0;
-    preusmeritev_vhoda = 0;
+    //preusmeritev ni
 
     token_count = tokenize(line, tokens);
     int st_ukaza = ukaz_lookup();
@@ -869,7 +867,6 @@ int izvajanje_ukaza_v_cevovodu(int st_stopnje){
 int zacetna_stopnja(int ta_stopnja){
 
     pipe(tabela_cevi[ta_stopnja]);
-    fflush(stdin);
     if(!fork()){
         //prva stopnja
         dup2(tabela_cevi[ta_stopnja][1], 1); //izhod te stopnje preusmerimo v cev
@@ -878,10 +875,6 @@ int zacetna_stopnja(int ta_stopnja){
         
         izvajanje_ukaza_v_cevovodu(ta_stopnja);
 
-        exit(izhodni_status);
-    }
-    else{
-        close(tabela_cevi[ta_stopnja][1]);
     }
 
 }
@@ -890,7 +883,6 @@ int sredinska_stopnja(int ta_stopnja){
 
     //int ta_stopnja = naslednja_stopnja_cevovoda++;
     pipe(tabela_cevi[ta_stopnja]);
-    fflush(stdin);
     if(!fork()){
         //neka vmesna stopnja
         dup2(tabela_cevi[ta_stopnja-1][0], 0); //izhod prejsnje cevi preusmerimo na vhod te stopnje
@@ -902,15 +894,11 @@ int sredinska_stopnja(int ta_stopnja){
 
         izvajanje_ukaza_v_cevovodu(ta_stopnja);
 
-        exit(izhodni_status);
-
     }
     else{
         //stars
         close(tabela_cevi[ta_stopnja-1][0]); //zapremo prejsnjo cev
         close(tabela_cevi[ta_stopnja-1][1]);
-        close(tabela_cevi[ta_stopnja][0]);
-        close(tabela_cevi[ta_stopnja][1]);
     }
 
 }
@@ -918,7 +906,6 @@ int sredinska_stopnja(int ta_stopnja){
 int koncna_stopnja(int ta_stopnja){
 
     //int ta_stopnja = naslednja_stopnja_cevovoda++;
-    fflush(stdin);
     if(!fork()){
         //zadnja stopnja
         dup2(tabela_cevi[ta_stopnja-1][0], 0); //izhod prejsnje cevi na vhod te stopnje
@@ -927,11 +914,10 @@ int koncna_stopnja(int ta_stopnja){
 
         izvajanje_ukaza_v_cevovodu(ta_stopnja);
 
-        exit(izhodni_status);
     }
     else{
         //stars
-        close(tabela_cevi[ta_stopnja-1][0]);
+
         //pocakamo vse stopnje razen zadnje
         for(int i=0; i < stevilo_stopenj-1; i++){
             wait(NULL);
@@ -943,7 +929,7 @@ int koncna_stopnja(int ta_stopnja){
         if(WIFEXITED(ext_stat)){
             ext_stat = WEXITSTATUS(ext_stat);
         }
- 
+
         izhodni_status = ext_stat;
 
     }
@@ -956,21 +942,12 @@ int pipes(){
 
     stevilo_stopenj = token_count - 1; // -1 za "pipes"
 
-   // int test1;
-    //int test2;
-    //test1 = dup(STDOUT_FILENO);
-    //test2 = dup(STDIN_FILENO);
-
     for(int s = 0; s < stevilo_stopenj; s++){
         if(s==0) zacetna_stopnja(s);
         else if(s==stevilo_stopenj-1) koncna_stopnja(s);
         else sredinska_stopnja(s);
     }
     
-    //dup2(test1, STDERR_FILENO);
-    //dup2(test2, STDIN_FILENO);
-
-    return 0;
 }
 
 //####################################################################################
@@ -993,7 +970,6 @@ int main(){
     signal(SIGCHLD, rokovalnik_za_zombije);
 
     setbuf(stdout, NULL);
-    setbuf(stdin, NULL);
 
     if(isatty(0)){
         nacin = 1;

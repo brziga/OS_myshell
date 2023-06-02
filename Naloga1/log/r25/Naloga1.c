@@ -881,7 +881,7 @@ int zacetna_stopnja(int ta_stopnja){
         exit(izhodni_status);
     }
     else{
-        close(tabela_cevi[ta_stopnja][1]);
+        int test;
     }
 
 }
@@ -909,8 +909,6 @@ int sredinska_stopnja(int ta_stopnja){
         //stars
         close(tabela_cevi[ta_stopnja-1][0]); //zapremo prejsnjo cev
         close(tabela_cevi[ta_stopnja-1][1]);
-        close(tabela_cevi[ta_stopnja][0]);
-        close(tabela_cevi[ta_stopnja][1]);
     }
 
 }
@@ -931,19 +929,19 @@ int koncna_stopnja(int ta_stopnja){
     }
     else{
         //stars
-        close(tabela_cevi[ta_stopnja-1][0]);
+
         //pocakamo vse stopnje razen zadnje
-        for(int i=0; i < stevilo_stopenj-1; i++){
+        for(int i=0; i < stevilo_stopenj; i++){
             wait(NULL);
         }
 
         //za zadnjo polovimo status
         int ext_stat;
-        waitpid(-1, &ext_stat, 0);
+/*         waitpid(-1, &ext_stat, 0);
         if(WIFEXITED(ext_stat)){
             ext_stat = WEXITSTATUS(ext_stat);
         }
- 
+ */
         izhodni_status = ext_stat;
 
     }
@@ -970,7 +968,6 @@ int pipes(){
     //dup2(test1, STDERR_FILENO);
     //dup2(test2, STDIN_FILENO);
 
-    return 0;
 }
 
 //####################################################################################

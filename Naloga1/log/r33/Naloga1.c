@@ -909,8 +909,7 @@ int sredinska_stopnja(int ta_stopnja){
         //stars
         close(tabela_cevi[ta_stopnja-1][0]); //zapremo prejsnjo cev
         close(tabela_cevi[ta_stopnja-1][1]);
-        close(tabela_cevi[ta_stopnja][0]);
-        close(tabela_cevi[ta_stopnja][1]);
+
     }
 
 }

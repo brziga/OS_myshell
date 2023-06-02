@@ -931,7 +931,7 @@ int koncna_stopnja(int ta_stopnja){
     }
     else{
         //stars
-        close(tabela_cevi[ta_stopnja-1][0]);
+
         //pocakamo vse stopnje razen zadnje
         for(int i=0; i < stevilo_stopenj-1; i++){
             wait(NULL);
@@ -970,7 +970,6 @@ int pipes(){
     //dup2(test1, STDERR_FILENO);
     //dup2(test2, STDIN_FILENO);
 
-    return 0;
 }
 
 //####################################################################################
