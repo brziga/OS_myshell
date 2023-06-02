@@ -167,6 +167,7 @@ int zunanji_ukaz(){
         return status_za_return;
     }
     else if(pid == 0){
+        //otrok
         if(preusmeritev_izhoda){
             int p_i_fd = open(preusmerjen_izhod, O_WRONLY | O_CREAT | O_TRUNC, 0644);
             if(p_i_fd < 0){
@@ -956,7 +957,7 @@ int pipes(){
 
     stevilo_stopenj = token_count - 1; // -1 za "pipes"
 
-   // int test1;
+    //int test1;
     //int test2;
     //test1 = dup(STDOUT_FILENO);
     //test2 = dup(STDIN_FILENO);
@@ -1076,6 +1077,7 @@ int main(){
                     preusmeritev_vhoda = 0;
                 }
                 izhodni_status = tabela_kazalcev_funkcij_ukazov[indeks_ukaza]();
+                //print (1/2)
                 printf("%s",izhodni_izpis);
                 exit(izhodni_status);
             }
@@ -1083,6 +1085,7 @@ int main(){
                 //koda starsa
             }
         }
+
         else{
             //izvajanje v ospredju
             if(indeks_ukaza != 31){
@@ -1133,6 +1136,7 @@ int main(){
                 }
             }
             izhodni_status = tabela_kazalcev_funkcij_ukazov[indeks_ukaza]();
+            //print (2/2)
             printf("%s",izhodni_izpis);
 
             //restore fd ce je bila preusmeritev
@@ -1158,8 +1162,7 @@ int main(){
                 }
                 preusmeritev_vhoda = 0;
             }
-        }
-        
+        } 
 
     } //loop {while 1}
 
