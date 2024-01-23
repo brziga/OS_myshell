@@ -1,4 +1,5 @@
 # OS 2022/2023 
 <br>
 <br>
-A basic shell. Homework assignment for Operating systems.
+Ukazna lupina za predmet Operacijski sistemi. <br>
+_Homework assignment for Operating systems._
