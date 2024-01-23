@@ -2,4 +2,4 @@
 <br>
 <br>
 Ukazna lupina za predmet Operacijski sistemi. <br>
-_Homework assignment for Operating systems._
+Homework assignment for Operating systems.
